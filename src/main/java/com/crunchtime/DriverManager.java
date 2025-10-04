@@ -47,7 +47,7 @@ public class DriverManager {
             options.setExperimentalOption("prefs", prefs);
             options.addArguments("--user-data-dir=" + userDataDir);
             options.addArguments("--no-sandbox");
-            options.addArguments("--headless=new");
+            
             WebDriver instance = new ChromeDriver(options);
             driver.set(instance);
         }
