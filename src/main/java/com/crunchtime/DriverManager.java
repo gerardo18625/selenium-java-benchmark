@@ -28,6 +28,8 @@ public class DriverManager {
 
     public static WebDriver getDriver(){
         if(driver.get() == null){
+            String uniqueDir = "browser-profile-" + Thread.currentThread().getId();
+            String userDataDir = "/tmp/" + uniqueDir;
             Map<String, Object> prefs = new HashMap<>();
             try {
                 Path dir = Files.createTempDirectory("downloads_");
@@ -42,6 +44,7 @@ public class DriverManager {
 
             ChromeOptions options = new ChromeOptions();
             options.setExperimentalOption("prefs", prefs);
+            options.addArguments("--user-data-dir=" + userDataDir);
             WebDriver instance = new ChromeDriver(options);
             driver.set(instance);
         }
