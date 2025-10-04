@@ -42,9 +42,12 @@ public class DriverManager {
             prefs.put("download.directory_upgrade", true);
             prefs.put("safebrowsing.enabled", true);
 
+
             ChromeOptions options = new ChromeOptions();
             options.setExperimentalOption("prefs", prefs);
             options.addArguments("--user-data-dir=" + userDataDir);
+            options.addArguments("--no-sandbox");
+            options.addArguments("--headless=new");
             WebDriver instance = new ChromeDriver(options);
             driver.set(instance);
         }

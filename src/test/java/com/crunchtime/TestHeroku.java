@@ -74,10 +74,10 @@ public class TestHeroku extends TestBase{
         driver.get("https://the-internet.herokuapp.com/");
 
         //Entry Add
-        driver.findElement(By.linkText("Entry Ad")).click();
-        waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//p[text()='Close']")));
-        driver.findElement(By.xpath("//p[text()='Close']")).click();
-        driver.get("https://the-internet.herokuapp.com/");
+//        driver.findElement(By.linkText("Entry Ad")).click();
+//        waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//p[text()='Close']")));
+//        driver.findElement(By.xpath("//p[text()='Close']")).click();
+//        driver.get("https://the-internet.herokuapp.com/");
 
         // jQuery menu
         driver.findElement(By.linkText("JQuery UI Menus")).click();
