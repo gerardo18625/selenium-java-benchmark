@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Playwright Java Benchmark" configfailurepolicy="continue" parallel="methods" thread-count="${threadCount}">
+    <test name="Test">
+        <classes>
+            <class name="com.crunchtime.TestHeroku"/>
+        </classes>
+    </test>
+</suite>
