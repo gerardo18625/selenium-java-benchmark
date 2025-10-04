@@ -1,0 +1,90 @@
+name: Selenium (Java) Benchmark
+on:
+  workflow_dispatch:
+    inputs:
+      threads:
+        description: 'Number of threads (e.g., 1, 2, etc.)'
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
+          - '4'
+          - '5'
+          - '6'
+          - '7'
+          - '8'
+          - '9'
+          - '10'
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Define Resource Monitor Script
+        run: |
+          echo '#!/bin/bash' > monitor.sh
+          echo 'while true; do' >> monitor.sh
+          echo '  CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk "{print 100 - \$1}")' >> monitor.sh
+          echo '  MEM_USAGE=$(free -m | grep Mem | awk "{print \$3/\$2 * 100.0}")' >> monitor.sh
+          # Changed log file name from resource_log_java.txt to resource_log_selenium.txt
+          echo '  echo "$(date +%s),CPU:$CPU_USAGE,MEM:$MEM_USAGE" >> resource_log_selenium.txt' >> monitor.sh
+          echo '  sleep 3' >> monitor.sh
+          echo 'done' >> monitor.sh
+          chmod +x monitor.sh
+        shell: bash
+
+      - name: Report runner specifications
+        run: |
+          echo "--- CPU Info ---"
+                  nproc --all
+                  lscpu
+                  echo "--- Memory Info ---"
+                  free -h
+                  echo "--- Disk Space ---"
+                  df -h
+
+      - name: Build & Install
+        run: mvn -B install -D skipTests --no-transfer-progress
+
+      - name: Run tests and Monitor Resources
+        env:
+          THREADS: ${{ github.event.inputs.threads }}
+        run: |
+          ./monitor.sh &
+          MONITOR_PID=$!
+          echo "Monitor PID: $MONITOR_PID"
+          
+          mvn test -DthreadCount=${THREADS} -DsuiteXmlFile=runner.xml
+          TEST_EXIT_CODE=$?
+          
+          kill $MONITOR_PID
+          
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+              echo "Tests failed with exit code $TEST_EXIT_CODE."
+              exit $TEST_EXIT_CODE
+          fi
+        shell: bash
+      - name: Upload TestNG Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: TestNG-Report
+          path: target/surefire-reports/
+          retention-days: 7
+
+      - name: Upload performance log
+        uses: actions/upload-artifact@v4
+        if: ${{!cancelled()}}
+        with:
+          name: selenium-java-performance-log
+          path: resource_log_selenium.txt
+          retention-days: 7
