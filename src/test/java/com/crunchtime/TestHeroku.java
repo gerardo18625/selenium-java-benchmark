@@ -78,6 +78,7 @@ public class TestHeroku extends TestBase{
 
         // jQuery menu and File Download
         driver.findElement(By.linkText("JQuery UI Menus")).click();
+        waiter.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li[id='ui-id-3']>a")));
         driver.findElement(By.cssSelector("li[id='ui-id-3']>a")).click();
         waiter.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li[id='ui-id-4']>a")));
         driver.findElement(By.cssSelector("li[id='ui-id-4']>a")).click();
