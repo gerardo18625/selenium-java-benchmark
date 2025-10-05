@@ -6,6 +6,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -38,11 +39,13 @@ public class TestHeroku extends TestBase{
         WebDriver driver = getDriver();
         WebDriverWait waiter = new WebDriverWait(driver, Duration.ofSeconds(10));
 
+        System.out.println("Running the test");
 
         // Navigate to the herokuApp
-        driver.get("https://the-internet.herokuapp.com/");
+         driver.get("https://the-internet.herokuapp.com/");
 
         // Add and remove elements
+        waiter.until(ExpectedConditions.elementToBeClickable(By.linkText("Add/Remove Elements")));
         driver.findElement(By.linkText("Add/Remove Elements")).click();
         driver.findElement(By.cssSelector("button[onclick='addElement()']")).click();
         Assert.assertTrue(driver.findElement(By.cssSelector("button[class='added-manually']")).isDisplayed());
@@ -73,7 +76,7 @@ public class TestHeroku extends TestBase{
         waiter.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[id='finish']")));
         driver.get("https://the-internet.herokuapp.com/");
 
-        // jQuery menu
+        // jQuery menu and File Download
         driver.findElement(By.linkText("JQuery UI Menus")).click();
         driver.findElement(By.cssSelector("li[id='ui-id-3']>a")).click();
         waiter.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li[id='ui-id-4']>a")));
@@ -103,7 +106,7 @@ public class TestHeroku extends TestBase{
         driver.switchTo().window(originalWindow);
         driver.get("https://the-internet.herokuapp.com/");
 
-        // Context menu
+        // Context Menu and Alert
         driver.findElement(By.linkText("Context Menu")).click();
         waiter.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[id='hot-spot']")));
         WebElement hotSpot = driver.findElement(By.cssSelector("div[id='hot-spot']"));
@@ -112,6 +115,31 @@ public class TestHeroku extends TestBase{
         waiter.until(ExpectedConditions.alertIsPresent());
         Alert alert = driver.switchTo().alert();
         alert.dismiss();
+
+        // Select dropdowns
+        driver.get("https://www.qaplayground.com/practice/select");
+        driver.findElement(By.xpath("(//button[@role='combobox'])[1]")).click();
+        waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@role='option']//span[text()='Banana']")));
+        driver.findElement(By.xpath("//div[@role='option']//span[text()='Banana']")).click();
+
+        WebElement superHero =  driver.findElement(By.xpath("//p[contains(text(),'hero')]/following-sibling::select"));
+        Select heroDropdown  = new Select(superHero);
+        heroDropdown.selectByValue("aquaman");
+
+        driver.findElement(By.xpath("(//button[@role='combobox'])[2]")).click();
+        waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@role='option']//span[text()='Java']")));
+        driver.findElement(By.xpath("//div[@role='option']//span[text()='Java']")).click();
+
+        driver.findElement(By.xpath("(//button[@role='combobox'])[3]")).click();
+        waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@role='option']//span[text()='UK']")));
+        driver.findElement(By.xpath("//div[@role='option']//span[text()='India']")).click();
+
+        // Date inputs
+        driver.get("https://www.qaplayground.com/practice/calendar");
+        waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("(//input[@name='my-birthday'])[1]")));
+        driver.findElement(By.xpath("(//input[@name='my-birthday'])[1]")).sendKeys("2020-01-01");
+        driver.findElement(By.xpath("(//input[@name='my-birthday'])[1]")).sendKeys("2026-01-01");
+
     }
 
     public static File waitForFile(Path dir, String fileName, int timeoutSeconds) throws InterruptedException {
